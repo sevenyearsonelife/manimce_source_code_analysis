@@ -2,6 +2,12 @@ import svgpathtools
 import numpy as np
 import matplotlib.pyplot as plt
 
+# 兼容 numpy 2.0：np.trapz 已移除并改名为 np.trapezoid（旧版 numpy 回退到 np.trapz）
+try:
+    from numpy import trapezoid
+except ImportError:
+    from numpy import trapz as trapezoid
+
 def svg_to_coef(path_to_file,nvec=2000,npoint=10000,npath=0,conj=True,reverse=False):
     
     path,_=svgpathtools.svg2paths(path_to_file)
@@ -25,7 +31,7 @@ def svg_to_coef(path_to_file,nvec=2000,npoint=10000,npath=0,conj=True,reverse=Fa
     for i in range(len(coefs)):
         coef=coefs[i]
         exponent=np.exp(1j*coef*points)
-        fourier_coef[i]=np.trapz(np.multiply(exponent,pathvals),points)/(2*np.pi)
+        fourier_coef[i]=trapezoid(np.multiply(exponent,pathvals),points)/(2*np.pi)
     coefs=np.array(coefs)
     return coefs,fourier_coef
 
